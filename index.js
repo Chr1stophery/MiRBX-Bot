@@ -14,32 +14,31 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
   ],
-})
+});
 
-const rest =  new REST({ version: '10' }).setToken(TOKEN);
+const rest = new REST({ version: '10' }).setToken(TOKEN);
 
 client.login(TOKEN);
 client.on('ready', () => {
-  console.log(client.user.tag + ' has logged in!');
+  console.log(`${client.user.tag} has logged in!`);
   client.user.setPresence({
-  status: 'idle'
+    status: 'idle',
   });
 });
 
 async function main() {
   const commands = [
     {
-     name: 'slaycommand',
-     type: 1,
-     description: 'The most zesty, slaying command to ever exist!',
+      name: 'slaycommand',
+      type: 1,
+      description: 'The most zesty, slaying command to ever exist!',
     },
-   ];
+  ];
   try {
     console.log('Started refreshing application (/) commands.');
     await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
       body: commands,
     });
-    client.login(TOKEN);
   } catch (err) {
     console.log(err);
   }
@@ -48,23 +47,20 @@ async function main() {
 main();
 
 const prefix = '!'; // You can change this to your preferred command prefix
-let count = 0;
-const countingChannelId = process.env.COUNTING_CHANNEL_ID; // Replace with your counting channel ID
+let count = 9;
+const countingChannelId = '1177931143098675270';
 
 client.on('messageCreate', (message) => {
-  // Ignore messages from bots
-  if (message.author.bot) return;
-
-  // Check if the message is in the counting channel
   if (message.channel.id === countingChannelId) {
-    // Check if the message is the next number in the sequence
-    if (parseInt(message.content) === count + 1) {
+    const messageNumber = parseInt(message.content);
+    if (!isNaN(messageNumber) && messageNumber === count + 1) {
       count++;
     } else {
-      // If the message is not the next number, delete it and reset the count
       message.delete();
     }
   }
+
+  if (message.author.bot) return;
 
   // Check if the message is a command
   if (message.content.startsWith(prefix)) {
